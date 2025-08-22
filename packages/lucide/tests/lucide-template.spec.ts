@@ -193,4 +193,35 @@ describe('createIcons - Template Element Support', () => {
     expect(svgElement?.getAttribute('class')).toContain('lucide');
     expect(svgElement?.getAttribute('class')).toContain('lucide-circle');
   });
+
+  it('should handle templates with nested elements containing lucide icons', () => {
+    document.body.innerHTML = `
+      <template id="nested-template">
+        <div class="container">
+          <div class="icon-wrapper">
+            <i data-lucide="heart" class="nested-icon"></i>
+          </div>
+          <span>Some text</span>
+        </div>
+      </template>
+    `;
+
+    createIcons({ icons: mockIcons });
+
+    const template = document.querySelector('#nested-template') as HTMLTemplateElement;
+    const templateContent = template.content;
+    const svgElement = templateContent.querySelector('svg');
+    const container = templateContent.querySelector('.container');
+    const wrapper = templateContent.querySelector('.icon-wrapper');
+
+    expect(svgElement).toBeTruthy();
+    expect(svgElement?.getAttribute('data-lucide')).toBe('heart');
+    expect(svgElement?.getAttribute('class')).toContain('nested-icon');
+    expect(svgElement?.getAttribute('class')).toContain('lucide-heart');
+    
+    // Verify the structure is preserved
+    expect(container).toBeTruthy();
+    expect(wrapper).toBeTruthy();
+    expect(wrapper?.contains(svgElement)).toBeTruthy();
+  });
 });
